@@ -46,6 +46,9 @@ var jQuery = function( selector, context ) {
 	
 	// The functions to execute on DOM ready
 	readyList = [],
+	
+	// Counts how many ready holds are active
+	readyHold = 0,
 
 	// The ready event handler
 	DOMContentLoaded,
@@ -360,9 +363,20 @@ jQuery.extend({
 	isReady: false,
 	
 	// Handle when the DOM is ready
-	ready: function() {
+	ready: function(state) {
 		// Make sure that the DOM is not already loaded
 		if ( !jQuery.isReady ) {
+			if ( typeof state === "boolean" ) {
+				// plugin is delaying or undelaying the ready event
+				if ( state ) {
+					readyHold--;
+				} else {
+					readyHold++;
+				}
+			}
+			if ( readyHold > 0 ) {
+				return;
+			}
 			// Make sure body exists, at least, in case IE gets a little overzealous (ticket #5443).
 			if ( !document.body ) {
 				return setTimeout( jQuery.ready, 13 );
